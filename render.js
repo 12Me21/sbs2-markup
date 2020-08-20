@@ -277,7 +277,7 @@
 				if (!protocol[0]) {
 					if (url[0] == "#") {
 						// put your fragment link handling code here
-						var hash1 = Nav.getPath()
+						/*var hash1 = Nav.getPath()
 						var name = url.substr(1)
 						hash = "#"+hash1[0]+"#"+name
 						url = hash
@@ -291,7 +291,7 @@
 							} else {
 								window.location.hash = hash
 							}
-						}
+						}*/
 					} else {
 						// urls without protocol get https:// or http:// added
 						url = defaultProtocol()+"//"+url
