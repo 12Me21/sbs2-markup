@@ -89,6 +89,7 @@
 	}
 
 	Parse.options = {
+		maxDepth: 10,
 		append: function (parent, child) {
 			parent = parent.branch || parent.node
 			parent.appendChild(child.node)

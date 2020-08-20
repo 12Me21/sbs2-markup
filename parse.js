@@ -25,6 +25,7 @@ var Parse = {
 	var skipNextLineBreak
 	var textBuffer
 	var curr, output
+	var openBlocks
 	var stack
 	var startOfLine
 	var leadingSpaces
@@ -49,6 +50,7 @@ var Parse = {
 						x.used = false
 					})
 		blocks = myBlocks
+		openBlocks = 0
 		leadingSpaces = 0
 		startOfLine = true
 		skipNextLineBreak = false
@@ -132,6 +134,7 @@ var Parse = {
 				i--
 			}
 			curr = stack[i].node
+			openBlocks--
 		} else {
 			curr = null
 		}
@@ -198,7 +201,9 @@ var Parse = {
 	function startBlock(type, data, arg) {
 		data.type = type
 		if (type) {
-			
+			openBlocks++
+			if (openBlocks > options.maxDepth)
+				throw "too deep nestted blocks"
 			var node = tryGetCached(cache, type, arg && arg[""], function() {
 				return blocks[type](arg)
 			})
