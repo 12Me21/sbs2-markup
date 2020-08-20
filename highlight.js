@@ -520,7 +520,6 @@ Highlight.highlight = function(text, lang) {
 	var prev = NaN
 	var buffer = ""
 	function callback(word, cls) {
-		console.log(word, cls)
 		if (cls == prev) {
 			buffer += word
 			return
