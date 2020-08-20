@@ -32,14 +32,6 @@ var Parse = {
 	var blocks
 	function scan(){}
 
-	function errorHandle(func) {
-		try {
-			func()
-		} catch (e) {
-			// todo: close all blocks and add error message
-		}
-	}
-	
 	function init(scanFunc, myBlocks, text) {
 		scan = scanFunc
 		code = text

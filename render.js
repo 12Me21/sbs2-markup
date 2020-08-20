@@ -127,7 +127,7 @@
 			var language = args[""]
 			var node = document.createElement('pre')
 			node.setAttribute('data-lang', language)
-			node.innerHTML = highlightSB(contents, language)
+			node.appendChild(Highlight.highlight(contents, language || 'sb'))
 			return {block:true, node:node}
 		},
 		// inline code
