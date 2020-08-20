@@ -526,7 +526,7 @@ Highlight.highlight = function(text, lang) {
 		}
 		var element = document.createElement('span')
 		element.textContent = buffer
-		if (cls)
+		if (prev)
 			element.className = prev
 		doc.appendChild(element)
 		prev = cls
