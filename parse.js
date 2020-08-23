@@ -1120,7 +1120,9 @@ var Parse = {
 	Parse.parseLang = function(text, lang, preview) {
 		options = Parse.options //temp
 		i=0
-		code = text || ""
+		code = text
+		if (code == undefined)
+			return options.root().node
 		if (preview) {
 			cache = editorCache
 		} else {
