@@ -17,5 +17,5 @@ html rendering functions
 ** highlight.js
 syntax highlighter (for smilebasic)
 
-** build.js
+** build.sh
 build script (optional)
