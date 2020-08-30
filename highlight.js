@@ -479,10 +479,14 @@ Highlight.cLike = function(code, callback) {
 			next()
 			while (c && c!="\n" && c!='"')
 				next()
+			if (c=='"')
+				next()
 			push('string')
 		} else if (c=="'") {
 			next()
 			while (c && c!="\n" && c!="'")
+				next()
+			if (c=="'")
 				next()
 			push('string')
 		} else if (isAlpha(c) || c=="_" || c=="$") {
