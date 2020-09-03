@@ -138,6 +138,8 @@ var Parse = {
 		options.append(curr, node)
 		if (node.block)
 			skipNextLineBreak = true;
+		else
+			skipNextLineBreak = false;
 	}
 
 	// output contents of text buffer
