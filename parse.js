@@ -88,12 +88,25 @@ var Parse = {
 					scan()
 				}
 			}
-		else
-			while (isUrlChar(c))
-				scan()
+		else {
+			var depth = 0
+			while (c) {
+				if ((/[-\w\$\.+!*',;/\?:@=&#%~]/).test(c)) {
+					scan()
+				} else if (c=="(") {
+					depth++
+					scan()
+				} else if (c==")") {
+					depth--
+					if (depth < 0)
+						break;
+					scan()
+				} else
+					break;
+			}
+		}
 		return code.substring(start, i)
 	}
-
 	
 	// ew regex
 	function isUrlChar(c) {
