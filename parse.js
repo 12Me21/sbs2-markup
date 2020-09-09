@@ -76,26 +76,25 @@ var Parse = {
 	// if `allow` is true, url is only ended by end of file or ]] or ][ (TODO)
 	function readUrl(allow) {
 		var start = i
+		var depth = 0
 		if (allow)
 			while (c) {
-				if (eatChar("]")) {
-					if (c=="[" || c=="]") {
-						i -= 2
-						scan()
+				if (eatChar("[")) {
+					depth++
+				} else if (c=="]") {
+					depth--
+					if (depth<0)
 						break
-					}
-				} else {
 					scan()
-				}
+				} else
+					scan()
 			}
 		else {
-			var depth = 0
 			while (c) {
 				if ((/[-\w\$\.+!*',;/\?:@=&#%~]/).test(c)) {
 					scan()
-				} else if (c=="(") {
+				} else if (eatChar("(")) {
 					depth++
-					scan()
 				} else if (c==")") {
 					depth--
 					if (depth < 0)
