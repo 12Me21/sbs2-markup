@@ -77,8 +77,17 @@ var Parse = {
 	function readUrl(allow) {
 		var start = i
 		if (allow)
-			while (c && c!="]" && c!="[")
-				scan()
+			while (c) {
+				if (eatChar("]")) {
+					if (c=="[" || c=="]") {
+						i -= 2
+						scan()
+						break
+					}
+				} else {
+					scan()
+				}
+			}
 		else
 			while (isUrlChar(c))
 				scan()
@@ -1123,7 +1132,7 @@ var Parse = {
 		options = Parse.options //temp
 		i=0
 		code = text
-		if (code == undefined)
+		if (code == undefined || code == "") // "" is... debatable
 			return options.root().node
 		if (preview) {
 			cache = editorCache
