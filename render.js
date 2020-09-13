@@ -124,10 +124,10 @@
 		},
 		// code block
 		code: function(args, contents) {
-			var language = args[""]
+			var language = args[""] || 'sb'
 			var node = document.createElement('pre')
 			node.setAttribute('data-lang', language)
-			node.appendChild(Highlight.highlight(contents, language || 'sb'))
+			node.appendChild(Highlight.highlight(contents, language))
 			return {block:true, node:node}
 		},
 		// inline code
@@ -203,7 +203,7 @@
 				stop.onclick = function(e) {
 					e.preventDefault()
 					div.dispatchEvent(newEvent("beforeSizeChange"));
-					ifc.innerHTML = ""
+					ifc.textContent = ""
 					div.className = "youtube"
 					div.dispatchEvent(newEvent("afterSizeChange"));
 				}
