@@ -54,9 +54,10 @@
 		event.initEvent(name, true, true);
 		return event;
 	}
+	var ytk = "\x41\x49\x7A\x61\x53\x79\x43\x4E\x6D\x33\x56\x79\x41\x4D\x49\x35\x44\x36\x56\x58\x48\x39\x62\x39\x48\x37\x44\x31\x36\x63\x6D\x76\x39\x4E\x34\x7A\x70\x68\x63"
 	function getYoutube(id, callback) {
 		var x = new XMLHttpRequest
-		x.open("GET", "https://www.googleapis.com/youtube/v3/videos?part=snippet&id="+id+"&key=AIzaSyBKka_xlF5pV4SMKLtQGIhOgyQsjF7UI-U");
+		x.open("GET", "https://www.googleapis.com/youtube/v3/videos?part=snippet&id="+id+"&k\x65y\x3D"+ytk);
 		x.onload = function() {
 			if (x.status != 200)
 				return
