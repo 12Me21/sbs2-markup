@@ -496,7 +496,7 @@ Highlight.cLike = function(code, callback) {
 			push('word')
 		} else {
 			next()
-			push('shit')
+			push()
 		}
 	}
 
