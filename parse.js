@@ -305,17 +305,6 @@ var Parse = {
 				endLine()
 				//==========
 				// \ escape
-			} else if (eatChar("i")) {
-				if (code[i-2] && /\w/.test(code[i-2])) {
-					addText("i")
-				} else if (c && /\w/.test(c)) {
-					addText("i")
-				} else {
-					var n = document.createElement("span")
-					n.textContent = "i"
-					n.className = "i"
-					addBlock({node: n})
-				}
 			} else if (eatChar("\\")) {
 				if (c == "\n") {
 					flushText()
