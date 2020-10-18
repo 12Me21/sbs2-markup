@@ -817,7 +817,7 @@ var Parse = {
 				return "audio"
 			if (/(\.mp4(?!\w)|\.mkv(?!\w)|#video$)/.test(url))
 				return "video"
-			if (/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(url))
+			if (/^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(url))
 				return "youtube"
 			return "image"
 		}
