@@ -565,26 +565,33 @@ var Parse = {
 				if (eatChar("[")) {
 					// read url:
 					var start = i
-					var part2 = false
+					var after = false
 					var url = readUrl(true)
 					if (eatChar("]")) {
 						if (eatChar("]")){
 						}else if (eatChar("["))
-							part2 = true
+							after = true
 					}
-					if (embed)
-						var type = urlType(url);
-					else
-						type = 'link';
-					if (type == "youtube") {
-						addBlock(options.youtube({"":url}, preview));
-						if (part2)
-							addText("[") // scary
+					if (embed) {
+						var type = urlType(url)
+						var altText = null
+						if (after) {
+							altText = ""
+							while (c) { //TODO: should this break on newline too?
+								if (c==']' && code[i+1]==']') { //messy
+									scan()
+									scan()
+									break;
+								}
+								eatChar("\\")
+								altText += c
+								scan()
+							}
+						}
+						addBlock(options[type]({"":url}, altText, preview));
 					} else {
-						startBlock(type, {big: true}, {"":url}, preview)
-						if (part2)
-							stack.top().inBrackets = true
-						else {
+						startBlock('link', {big: true, inBrackets: after}, {"":url}, preview)
+						if (!after) {
 							addText(url)
 							endBlock()
 						}
@@ -715,7 +722,7 @@ var Parse = {
 				var after = eatChar("[")
 				
 				if (embed) {
-					var type = urlType(url);
+					var type = urlType(url)
 					var altText = null
 					if (after) {
 						altText = ""
@@ -726,7 +733,7 @@ var Parse = {
 						}
 						scan()
 					}
-					addBlock(options[type]({"":url}, altText, preview));
+					addBlock(options[type]({"":url}, altText, preview))
 				} else {
 					startBlock('link', {inBrackets: after}, {"":url}, preview)
 					if (!after) {
@@ -737,7 +744,7 @@ var Parse = {
 				return true
 			}
 		}
-		
+	
 		// closeAll(true) - called at end of document
 		// closeAll(false) - called at end of {} block
 		function closeAll(force) {
