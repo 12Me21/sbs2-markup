@@ -137,24 +137,28 @@
 			node.textContent = contents
 			return {node:node, block:false}
 		},
-		audio: function(args) {
+		audio: function(args, contents) {
 			var node = document.createElement('audio')
 			node.setAttribute('controls', "")
 			node.setAttribute('src', args[""])
+			if (contents != null)
+				node.appendChild(document.createTextNode(contents))
 			return {block:true, node:node}
 		},
-		video: function(args) {
+		video: function(args, contents) {
 			var url = args[""]
 			var node = document.createElement('video')
 			node.setAttribute('controls', "")
 			node.setAttribute('src', url)
 			node.setAttribute('shrink', "")
+			if (contents != null)
+				node.appendChild(document.createTextNode(contents))
 			node.onplaying = function() {
 				node.dispatchEvent(newEvent('videoclicked'))
 			}
 			return {block:true, node:node}
 		},
-		youtube: function(args, preview) {
+		youtube: function(args, contents, preview) { //todo: use contents?
 			var url = args[""]
 			var protocol = defaultProtocol()
 			var match = getYoutubeID(url)
@@ -342,7 +346,7 @@
 			return {node:node}
 		},
 		
-		image: function(args) {
+		image: function(args, alt) {
 			// <img src= arg tabindex="-1">
 			var url = args[""]
 			var node = document.createElement('img')
@@ -350,6 +354,8 @@
 			node.setAttribute('tabindex', "-1")
 			node.setAttribute('shrink', "")
 			node.setAttribute('loading', "")
+			if (alt != null)
+				node.setAttribute('alt', alt)
 			node.onerror = node.onload = function() {
 				node.removeAttribute('loading')
 			}

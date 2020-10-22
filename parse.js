@@ -714,16 +714,21 @@ var Parse = {
 				var url = readUrl()
 				var after = eatChar("[")
 				
-				if (embed)
+				if (embed) {
 					var type = urlType(url);
-				else
-					type = 'link';
-				if (type == "youtube") {
-					addBlock(options.youtube({"":url}, preview));
-					if (after)
-						addText("[") // scary
+					var altText = null
+					if (after) {
+						altText = ""
+						while (c && c!=']' && c!="\n") {
+							eatChar("\\")
+							altText += c
+							scan()
+						}
+						scan()
+					}
+					addBlock(options[type]({"":url}, altText, preview));
 				} else {
-					startBlock(type, {inBrackets: after}, {"":url}, preview)
+					startBlock('link', {inBrackets: after}, {"":url}, preview)
 					if (!after) {
 						addText(url)
 						endBlock()
@@ -915,16 +920,16 @@ var Parse = {
 				return options.code(args, contents)
 			},
 			youtube: function(args, contents) {
-				return options.youtube({"":contents}, preview)
+				return options.youtube({"":contents}, args.alt, preview)
 			},
 			img: function(args, contents) {
-				return options.image({"":contents})
+				return options.image({"":contents}, args.alt)
 			},
 			audio: function(args, contents) {
-				return options.audio({"":contents})
+				return options.audio({"":contents}, args.alt)
 			},
 			video: function(args, contents) {
-				return options.video({"":contents})
+				return options.video({"":contents}, args.alt)
 			}
 		}
 
