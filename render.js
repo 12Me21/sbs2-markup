@@ -413,7 +413,7 @@
 			}
 			button.className = 'spoilerButton'
 			var name = args[""]
-			if (name == true)
+			if (name === true)
 				name = "spoiler"
 			button.textContent = name
 			

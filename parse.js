@@ -1007,7 +1007,7 @@ var Parse = {
 						if (eatChar(" ")) {
 							args = readArgList() || {}
 						}
-						if (arg!=true)
+						if (arg !== true)
 							args[""] = arg
 						if (eatChar("]")) {
 							if (specialBlock[name] && !(name == "url" && arg!=true)) {
