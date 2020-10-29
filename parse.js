@@ -103,17 +103,15 @@ var Parse = {
 				} else
 					break;
 			}
+			var last = code[i-1]
+			if (/[,\.?!:]/.test(last)) {
+				i-=2
+				scan()
+			}
 		}
 		return code.substring(start, i)
 	}
 	
-	// ew regex
-	function isUrlChar(c) {
-		// removed ) because interferes with stuff too much
-		// other problems common are
-		// - period, comma, etc. after url
-		return c && (/[-\w\$\.+!*'(,;/\?:@=&#%~]/).test(c)
-	}
 	/***********
     ** stack **
     ***********/
