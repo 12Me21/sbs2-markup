@@ -50,24 +50,24 @@
 		}
 	}
 	function newEvent(name) {
-		var event = document.createEvent("Event");
-		event.initEvent(name, true, true);
-		return event;
+		var event = document.createEvent("Event")
+		event.initEvent(name, true, true)
+		return event
 	}
 	var ytk = "\x41\x49\x7A\x61\x53\x79\x43\x4E\x6D\x33\x56\x79\x41\x4D\x49\x35\x44\x36\x56\x58\x48\x39\x62\x39\x48\x37\x44\x31\x36\x63\x6D\x76\x39\x4E\x34\x7A\x70\x68\x63"
 	function getYoutube(id, callback) {
 		var x = new XMLHttpRequest
-		x.open("GET", "https://www.googleapis.com/youtube/v3/videos?part=snippet&id="+id+"&k\x65y\x3D"+ytk);
+		x.open("GET", "https://www.googleapis.com/youtube/v3/videos?part=snippet&id="+id+"&k\x65y\x3D"+ytk)
 		x.onload = function() {
 			if (x.status != 200)
 				return
 			try {
 				var json = JSON.parse(x.responseText)
 				var video = json.items[0]
-				callback(video);
+				callback(video)
 			} catch(e){}
 		}
-		x.send();
+		x.send()
 	}
 	function defaultProtocol() {
 		if (window.location.protocol == 'http:')
@@ -170,16 +170,16 @@
 			
 			if (match) {
 				link.style.backgroundImage = 'url("'+protocol+"//i.ytimg.com/vi/"+match+"/mqdefault.jpg"+'")'
-				var time = url.match(/[&?](?:t|start)=(\w+)/);
-				var end = url.match(/[&?](?:end)=(\w+)/);
-				var loop = url.match(/[&?]loop(=|&|$)/);
+				var time = url.match(/[&?](?:t|start)=(\w+)/)
+				var end = url.match(/[&?](?:end)=(\w+)/)
+				var loop = url.match(/[&?]loop(=|&|$)/)
 				if (!preview)
 					getYoutube(match, function(data) {
 						var title = document.createElement('div')
 						title.className = 'pre videoTitle'
 						title.textContent = data.snippet.title
 						link.appendChild(title)
-						link.appendChild(document.createElement('br'));
+						link.appendChild(document.createElement('br'))
 						title = document.createElement('div')
 						title.className = 'pre videoAuthor'
 						title.textContent = data.snippet.channelTitle
@@ -189,28 +189,28 @@
 				link.appendChild(ifc)
 				link.onclick = function(e) {
 					e.preventDefault()
-					div.dispatchEvent(newEvent("beforeSizeChange"));
+					div.dispatchEvent(newEvent("beforeSizeChange"))
 					var iframe = document.createElement('iframe')
-					var src = "https://www.youtube-nocookie.com/embed/"+match+"?autoplay=1";
+					var src = "https://www.youtube-nocookie.com/embed/"+match+"?autoplay=1"
 					if (time)
-						src += "&start="+time[1];
+						src += "&start="+time[1]
 					if (end)
-						src += "&end="+end[1];
+						src += "&end="+end[1]
 					if (loop)
-						src += "&loop=1&playlist="+match;
-					iframe.src = src;
+						src += "&loop=1&playlist="+match
+					iframe.src = src
 					ifc.appendChild(iframe)
 					div.className = "youtube playingYoutube"
-					div.dispatchEvent(newEvent("afterSizeChange"));
+					div.dispatchEvent(newEvent("afterSizeChange"))
 				}
 				var stop = document.createElement('button')
 				stop.textContent = "x"
 				stop.onclick = function(e) {
 					e.preventDefault()
-					div.dispatchEvent(newEvent("beforeSizeChange"));
+					div.dispatchEvent(newEvent("beforeSizeChange"))
 					ifc.textContent = ""
 					div.className = "youtube"
-					div.dispatchEvent(newEvent("afterSizeChange"));
+					div.dispatchEvent(newEvent("afterSizeChange"))
 				}
 				div.appendChild(stop)
 			}

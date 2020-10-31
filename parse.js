@@ -98,10 +98,10 @@ var Parse = {
 				} else if (c==")") {
 					depth--
 					if (depth < 0)
-						break;
+						break
 					scan()
 				} else
-					break;
+					break
 			}
 			var last = code[i-1]
 			if (/[,\.?!:]/.test(last)) {
@@ -156,9 +156,9 @@ var Parse = {
 		flushText()
 		options.append(curr, node)
 		if (node.block)
-			skipNextLineBreak = true;
+			skipNextLineBreak = true
 		else
-			skipNextLineBreak = false;
+			skipNextLineBreak = false
 	}
 
 	// output contents of text buffer
@@ -546,11 +546,11 @@ var Parse = {
 		function endAll() {
 			flushText()
 			while (stack.length) {
-				/*var top = stack.top();
+				/*var top = stack.top()
 				if (top.type == "bold") {
-					options.kill(curr.node, options.text("*").node);
+					options.kill(curr.node, options.text("*").node)
 				} else if (top.type == "italic") {
-					options.kill(curr.node, options.text("/").node);
+					options.kill(curr.node, options.text("/").node)
 				}*/
 				endBlock()
 			}
@@ -579,14 +579,14 @@ var Parse = {
 								if (c==']' && code[i+1]==']') { //messy
 									scan()
 									scan()
-									break;
+									break
 								}
 								eatChar("\\")
 								altText += c
 								scan()
 							}
 						}
-						addBlock(options[type]({"":url}, altText, preview));
+						addBlock(options[type]({"":url}, altText, preview))
 					} else {
 						startBlock('link', {big: true, inBrackets: after}, {"":url}, preview)
 						if (!after) {
@@ -620,7 +620,7 @@ var Parse = {
 					addBlock(options.invalid(code.substring(start, i), "invalid tag"))
 				}
 				/*if (displayBlock({type:name}))
-				  skipNextLineBreak = true; //what does this even do?*/
+				  skipNextLineBreak = true //what does this even do?*/
 			}
 			lineStart()
 			//	eatChar("\n")
@@ -1167,7 +1167,7 @@ var Parse = {
 		} catch(e) {
 			try {
 				if (!output) {
-					output = options.root();
+					output = options.root()
 				}
 				options.append(output, options.error(e, e.stack))
 				options.append(output, options.text(code.substr(i)))
