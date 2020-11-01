@@ -16,6 +16,40 @@ var Parse = {
 // I'm not sure of a good way which still allows # to be used in the path+query, though
 // may need to use a different character...
 
+Parse.BLOCKS = {
+	text: {},
+	lineBreak: {},
+	line: {block: true}, // now we can remove the hack
+	invalid: {},
+	code: {block:true},
+	icode: {},
+	audio: {block:true},
+	video: {block:true},
+	youtube: {block:true},
+	bg: {},
+	root: {},
+	bold: {},
+	italic: {},
+	underline: {},
+	strikethrough: {},
+	heading: {block:true},
+	quote: {block:true},
+	list: {block:true},
+	item: {block:true},
+	link: {},
+	table: {block:true},
+	row: {block:true},//not sure, only used internally so block may not matter
+	cell: {},
+	image: {block:true},
+	error: {block:true},
+	align: {block:true},
+	superscript: {},
+	subscript: {},
+	anchor: {},
+	spoiler: {block:true},
+	bg: {},
+}
+
 ;(function(){
 	/***********
 	 ** STATE **
@@ -134,7 +168,7 @@ var Parse = {
 	function endBlock() {
 		flushText()
 		var item = stack.pop()
-		if (item.node && item.node.block)
+		if (item.node && item.isBlock)
 			skipNextLineBreak = true
 
 		if (stack.length) {
@@ -213,6 +247,7 @@ var Parse = {
 
 	function startBlock(type, data, arg) {
 		data.type = type
+		data.isBlock = Parse.BLOCKS[type].block
 		if (type) {
 			openBlocks++
 			if (openBlocks > options.maxDepth)
@@ -221,7 +256,7 @@ var Parse = {
 				return blocks[type](arg)
 			})
 			data.node = node
-			if (node.block)
+			if (data.isBlock)
 				skipNextLineBreak = true
 			
 			flushText()

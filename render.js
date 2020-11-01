@@ -3,9 +3,8 @@
 // to control the output
 
 // most functions should return an object containing:
-//   .node or .nodes - the node(s) to insert
-//   .branch - (optional if .node was specified) which node to insert children into
-//   .block - `true` if the element is display: block or similar.
+//   .node - the node to insert. use a DocumentFragment for multiple nodes
+//   .branch - which node to insert children into (optional, defaults to .node)
 
 // most functions take input in the form of either
 // (args) (or (args, contents) for things where the contents are plain text)
@@ -129,13 +128,13 @@
 			var node = document.createElement('pre')
 			node.setAttribute('data-lang', language)
 			node.appendChild(Highlight.highlight(contents, language))
-			return {block:true, node:node}
+			return {node:node}
 		},
 		// inline code
 		icode: function(args, contents) {
 			var node = document.createElement('code')
 			node.textContent = contents
-			return {node:node, block:false}
+			return {node:node}
 		},
 		audio: function(args, contents) {
 			var node = document.createElement('audio')
@@ -143,7 +142,7 @@
 			node.setAttribute('src', args[""])
 			if (contents != null)
 				node.appendChild(document.createTextNode(contents))
-			return {block:true, node:node}
+			return {node:node}
 		},
 		video: function(args, contents) {
 			var url = args[""]
@@ -156,7 +155,7 @@
 			node.onplaying = function() {
 				node.dispatchEvent(newEvent('videoclicked'))
 			}
-			return {block:true, node:node}
+			return {node:node}
 		},
 		youtube: function(args, contents, preview) { //todo: use contents?
 			var url = args[""]
@@ -214,22 +213,14 @@
 				}
 				div.appendChild(stop)
 			}
-			return {block:true, node:div}
-		},
-		bg: function(opt) {
-			var node=document.createElement("span")
-			var color = opt[""]
-			if (color) {
-				node.setAttribute("data-bgcolor", color)
-			}
-			return {node:node}
+			return {node:div}
 		},
 		
 		//=====================
 		// nodes with children
 		root: function() {
 			var node = document.createDocumentFragment()
-			return {block:true, node:node}
+			return {node:node}
 		},
 		bold: creator('b'),
 		italic: creator('i'),
@@ -237,7 +228,7 @@
 		strikethrough: creator('s'),
 		heading: function(level) { // input: 1, 2, or 3
 			// output: h2-h4
-			return {block:true, node:document.createElement('h'+(level+1))}
+			return {node:document.createElement('h'+(level+1))}
 		},
 		
 		quote: function(args) {
@@ -250,7 +241,7 @@
 				node.appendChild(cite)
 				node.appendChild(document.createElement('br'))
 			}
-			return {block:true, node:node}
+			return {node:node}
 		},
 		list: function(args) {
 			// <ul> ... </ul>
@@ -259,10 +250,10 @@
 				list.style.listStyleType = args[""]
 			} else
 				list = document.createElement('ul')
-			return {block:true, node:list}
+			return {node:list}
 		},
 		item: function(index) {
-			return {block:true, node:document.createElement('li')}
+			return {node:document.createElement('li')}
 		},
 		//creator('li'), // (list item)
 		
@@ -317,7 +308,6 @@
 			var node = document.createElement('table')
 			container.appendChild(node)
 			return {
-				block: true,
 				node: container,
 				branch: node
 			}
@@ -360,7 +350,7 @@
 				node.removeAttribute('loading')
 			}
 			// todo: add events for size change ??
-			return {node:node, block:true}
+			return {node:node}
 		},
 		
 		// parser error message
@@ -378,7 +368,7 @@
 				pre.textContent = stack
 				node.appendChild(pre)
 			}
-			return {node:node, block:true}
+			return {node:node}
 		},
 		
 		align: function(args) {
@@ -386,7 +376,7 @@
 			var arg = args[""]
 			if (arg == 'left' || arg == 'right' || arg == 'center')
 				node.style.textAlign = arg
-			return {node:node, block:true}
+			return {node:node}
 		},
 		superscript: creator('sup'),
 		subscript: creator('sub'),
@@ -397,7 +387,7 @@
 			// I prefix the names to avoid collision with node ids
 			// which use the same namespace as name
 			node.name = "_anchor_"+name
-			return {node:node, block:true}
+			return {node:node}
 		},
 		spoiler: function(args) {
 			// <button> arg </button><div class="spoiler"> ... </div>
@@ -425,10 +415,17 @@
 			node.appendChild(box)
 			
 			return {
-				block: true,
 				node: node,
 				branch: box
 			}
-		}
+		},
+		bg: function(opt) {
+			var node=document.createElement("span")
+			var color = opt[""]
+			if (color) {
+				node.setAttribute("data-bgcolor", color)
+			}
+			return {node:node}
+		},
 	}
 })()
