@@ -954,8 +954,10 @@ Parse.BLOCKS = {
 					contents = contents.substr(1)
 				return ['code', args, contents]
 			}
+
+			//todo: maybe these should have args mapped over uh
 			if (name == 'url')
-				return ['link', args, contents]
+				return ['link', {"":contents}, contents]
 			
 			if (name == 'youtube')
 				return ['youtube', {"":contents}, args.alt]
@@ -1042,7 +1044,7 @@ Parse.BLOCKS = {
 						if (arg !== true)
 							args[""] = arg
 						if (eatChar("]")) {
-							if (blockNames[name]==2 && !(name=="url" && arg!=true)) {
+							if (blockNames[name]==2 && !(name=="url" && arg!==true)) {
 								var endTag = "[/"+name+"]"
 								var end = code.indexOf(endTag, i)
 								if (end < 0)
