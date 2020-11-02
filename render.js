@@ -270,7 +270,8 @@
 				var node = Nav.link(protocol[1])
 			} else {
 				var node = document.createElement('a')
-				node.setAttribute('target', "_blank")
+				if (url[0] != "#")
+					node.setAttribute('target', "_blank")
 				if (!protocol[0]) {
 					if (url[0] == "#") {
 						// put your fragment link handling code here
