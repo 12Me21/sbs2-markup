@@ -256,8 +256,8 @@
 			return {node:document.createElement('li')}
 		},
 		//creator('li'), // (list item)
-		
-		link: function(args) {
+
+		link: function(args, contents) {
 			// <a href= url> ... </a>
 			var url = args[""]
 			// important, do not remove, prevents script injection
@@ -298,6 +298,9 @@
 				}
 				node.href = url
 			}
+			if (contents != undefined)
+				node.textContent = contents
+			
 			return {node:node}
 		},
 		

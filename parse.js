@@ -66,7 +66,7 @@ Parse.BLOCKS = {
 	var blocks
 	function scan(){}
 
-	function init(scanFunc, myBlocks, text) {
+	function init(scanFunc, text) {
 		scan = scanFunc
 		code = text
 		if (cache)
@@ -75,7 +75,7 @@ Parse.BLOCKS = {
 					cache[type][arg].forEach(function(x){
 						x.used = false
 					})
-		blocks = myBlocks
+		blocks = options//myBlocks
 		openBlocks = 0
 		leadingSpaces = 0
 		startOfLine = true
@@ -322,7 +322,7 @@ Parse.BLOCKS = {
 				leadingSpaces++
 			i++
 			c = code.charAt(i)
-		}, options, codeInput)
+		}, codeInput)
 		
 		var tags = {
 			spoiler: "spoiler",
@@ -909,70 +909,69 @@ Parse.BLOCKS = {
 		var noNesting = {
 			spoiler:true
 		}
-		var blocks = {
-			b: options.bold,
-			i: options.italic,
-			u: options.underline,
-			s: options.strikethrough,
-			sup: options.superscript,
-			sub: options.subscript,
-			h1: function(){return options.heading(1)},
-			h2: function(){return options.heading(2)},
-			h3: function(){return options.heading(3)},
-			table: options.table,
-			tr: options.row,
-			td: options.cell,
-			th: function(arg, opt){
-				return options.cell(Object.assign({h:true}, opt))
-			},
-			code: true, 
-			align: options.align,
-			url: options.link,//+<VERY special case> (only hardcode when no argument)
-			youtube: true, //<special case>,
-			audio: true,
-			video: true,
-			img: true, //<special case>,
-			list: options.list,
-			spoiler: options.spoiler,
-			quote: options.quote,
-			anchor: options.anchor,
-			item: options.item,
-		}
-		init(function() {
-			i++
-			c = code.charAt(i)
-		}, blocks, codeArg)
-		
-		var specialBlock = {
-			url: function(args, contents){
-				var node = options.link({"":contents})
-				options.append(node, options.text(contents))
-				return node
-			},
-			code: function(args, contents) {
+		// this translates bbcode tag names into
+		// the standard block names, + arg, + contents for special blocks
+		// to be passed to startblock or functions to addblock
+		var blockNames = {'b':true,'i':true,'u':true,'s':true,'sup':true,'sub':true,'table':true,'tr':true,'td':true,'align':true,'list':true,'spoiler':true,'quote':true,'anchor':true,'item':true,'h1':true,'h2':true,'h3':true,'th':true,'code':2,'url':true,'youtube':2,'audio':2,'video':2,'img':2}
+		function blockTranslate(name, args, contents) {
+			// direct translations:
+			var name2 = {
+				b: 'bold',
+				i: 'italic',
+				u: 'underline',
+				s: 'strikethrough',
+				sup: 'superscript',
+				sub: 'subscript',
+				table: 'table',
+				tr: 'row',
+				td: 'cell',
+				align: 'align',
+				list: 'list',
+				spoiler: 'spoiler',
+				quote: 'quote',
+				anchor: 'anchor',
+				item: 'item',
+			}[name]
+			if (name2)
+				return [name2, args, contents]
+			// other simple translations
+			if (name == 'h1')
+				return ['heading', 1]
+			if (name == 'h2')
+				return ['heading', 2]
+			if (name == 'h3')
+				return ['heading', 3]
+			if (name == 'th')
+				return ['cell', Object.assign({h:true}, args)]
+
+			if (name == 'code') {
 				var inline = args[""] == 'inline'
 				args[""] = args.lang
 				if (inline)
-					return options.icode(args, contents)
-				
+					return ['icode', args, contents]
 				if (contents[0]=="\n")
 					contents = contents.substr(1)
-				return options.code(args, contents)
-			},
-			youtube: function(args, contents) {
-				return options.youtube({"":contents}, args.alt, preview)
-			},
-			img: function(args, contents) {
-				return options.image({"":contents}, args.alt)
-			},
-			audio: function(args, contents) {
-				return options.audio({"":contents}, args.alt)
-			},
-			video: function(args, contents) {
-				return options.video({"":contents}, args.alt)
+				return ['code', args, contents]
 			}
+			if (name == 'url')
+				return ['link', args, contents]
+			
+			if (name == 'youtube')
+				return ['youtube', {"":contents}, args.alt]
+			if (name == 'audio')
+				return ['audio', {"":contents}, args.alt]
+			if (name == 'video')
+				return ['video', {"":contents}, args.alt]
+			if (name == 'img')
+				return ['image', {"":contents}, args.alt]
+			console.log("translate error", tag)
 		}
-
+		
+		init(function() {
+			i++
+			c = code.charAt(i)
+		}, codeArg)
+		
 		var point = 0
 		
 		while (c) {
@@ -991,7 +990,7 @@ Parse.BLOCKS = {
 						// end last item in lists
 						if (name == "list" && stack.top().type == "item")
 							endBlock(point)
-						if (name == stack.top().type) {
+						if (name == stack.top().bbcode) {
 							endBlock(point)
 							// eat whitespace between table cells
 							if (name == 'td' || name == 'th' || name == 'tr') {
@@ -1005,20 +1004,18 @@ Parse.BLOCKS = {
 				// [... start tag?
 				} else {
 					var name = readTagName()
-					if (!name || !blocks[name]) {
+					if (!name || !blockNames[name]) {
 						// special case [*] list item
 						if (eatChar("*") && eatChar("]")) {
 							if (stack.top().type == "item")
 								endBlock(point)
 							var top = stack.top()
-							if (top.type == "list") {
-								startBlock("item", {}, {})
-							}
+							if (top.type == "list")
+								startBlock('item', {bbcode:'item'}, {})
 							else
 								cancel()
-						} else {
+						} else
 							cancel()
-						}
 					} else {
 						// [tag=...
 						var arg = true, args = {}
@@ -1045,7 +1042,7 @@ Parse.BLOCKS = {
 						if (arg !== true)
 							args[""] = arg
 						if (eatChar("]")) {
-							if (specialBlock[name] && !(name == "url" && arg!=true)) {
+							if (blockNames[name]==2 && !(name=="url" && arg!=true)) {
 								var endTag = "[/"+name+"]"
 								var end = code.indexOf(endTag, i)
 								if (end < 0)
@@ -1056,24 +1053,25 @@ Parse.BLOCKS = {
 									
 									// todo: this can't handle args with caching currently
 									var node = tryGetCached(cache, name, contents, function() {
-										return specialBlock[name](args, contents)
+										var tx = blockTranslate(name, args, contents)
+										console.log('translate single tag', tx)
+										return options[tx[0]](tx[1], tx[2])
 									})
 									addBlock(node)
 									
 									if (node.block)
 										skipNextLineBreak = true
 								}
-							} else if (name!="item" && blocks[name] && !(noNesting[name] && stackContains(name))) {
-								if (name == 'tr' || name == 'table') {
+							} else if (name!="item" && blockNames[name] && !(noNesting[name] && stackContains(name))) {
+								if (name == 'tr' || name == 'table')
 									while(eatChar(' ')||eatChar('\n')){
 									}
-								}
-								startBlock(name, {}, args)
+								var tx = blockTranslate(name, args)
+								startBlock(tx[0], {bbcode:name}, tx[1])
 							} else
 								addBlock(options.invalid(code.substring(point, i), "invalid tag"))
-						} else {
+						} else
 							cancel()
-						}
 					}
 				}
 			} else if (readPlainLink()) {
@@ -1096,7 +1094,7 @@ Parse.BLOCKS = {
 		function readPlainLink() {
 			if (isUrlStart()) {
 				var url = readUrl()
-				addBlock(specialBlock.url({},url))
+				addBlock(options.link({"":url}, url))
 				return true
 			}
 		}
@@ -1173,8 +1171,7 @@ Parse.BLOCKS = {
 			// text before link
 			options.append(root, options.text(text.substring(last, result.index)))
 			// generate link
-			var link = options.link({"": result[0]})
-			options.append(link, options.text(result[0]))
+			var link = options.link({"": result[0]}, result[0])
 			options.append(root, link)
 			
 			last = result.index + result[0].length
