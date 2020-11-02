@@ -185,15 +185,7 @@ Parse.BLOCKS = {
 		}
 	}
 	
-	// add simple block with no children
-	function addBlock(node) {
-		flushText()
-		options.append(curr, node)
-		if (node.block)
-			skipNextLineBreak = true
-		else
-			skipNextLineBreak = false
-	}
+
 
 	// output contents of text buffer
 	function flushText() {
@@ -212,7 +204,7 @@ Parse.BLOCKS = {
 			skipNextLineBreak = false
 		} else {
 			flushText()
-			addBlock(options.lineBreak())
+			addBlock('lineBreak')
 		}
 	}
 
@@ -244,7 +236,20 @@ Parse.BLOCKS = {
 		}
 		return null
 	}
-
+	
+	// add simple block with no children
+	function addBlock(type, arg, ext1, ext2) {
+		flushText()
+		var node = tryGetCached(cache, type, arg && arg[""], function() {
+			return blocks[type](arg, ext1, ext2)
+		})
+		options.append(curr, node)
+		if (Parse.BLOCKS[type].block)
+			skipNextLineBreak = true
+		else
+			skipNextLineBreak = false
+	}
+	
 	function startBlock(type, data, arg) {
 		data.type = type
 		if (type) {
@@ -298,7 +303,7 @@ Parse.BLOCKS = {
 
 	var options = Parse.options
 	
-	Parse.lang['12y'] = function(codeInput, preview) {
+	Parse.lang['12y'] = function(codeInput) {
 		// so what happens here is
 		// when a video needs to be generated
 		// first, check the cache. if it exists there, insert it
@@ -341,7 +346,7 @@ Parse.BLOCKS = {
 			} else if (eatChar("\\")) {
 				if (c == "\n") {
 					flushText()
-					addBlock(options.lineBreak())
+					addBlock('lineBreak')
 				} else
 					addText(c)
 				scan()
@@ -410,8 +415,7 @@ Parse.BLOCKS = {
 					//-------------
 					// ---<EOL> hr
 					if (c == "\n" || !c) { //this is kind of bad
-						addBlock(options.line())
-						skipNextLineBreak = true //hack
+						addBlock('line')
 						//----------
 						// ---... normal text
 					} else {
@@ -527,10 +531,7 @@ Parse.BLOCKS = {
 						var eaten = eatChar("\n")
 						start = i
 						i = code.indexOf("```", i)
-						addBlock(options.code(
-							{"": language},
-							code.substring(start, i!=-1 ? i : code.length)
-						))
+						addBlock('code', {"": language}, code.substring(start, i!=-1 ? i : code.length))
 						skipNextLineBreak = eaten
 						if (i != -1) {
 							restore(i + 3)
@@ -559,7 +560,7 @@ Parse.BLOCKS = {
 						codeText += c
 						scan()
 					}
-					addBlock(options.icode({},codeText))
+					addBlock('icode',{},codeText)
 					scan()
 				}
 				//
@@ -621,9 +622,9 @@ Parse.BLOCKS = {
 								scan()
 							}
 						}
-						addBlock(options[type]({"":url}, altText, preview))
+						addBlock(type, {"":url}, altText)
 					} else {
-						startBlock('link', {big: true, inBrackets: after}, {"":url}, preview)
+						startBlock('link', {big: true, inBrackets: after}, {"":url})
 						if (!after) {
 							addText(url)
 							endBlock()
@@ -652,7 +653,7 @@ Parse.BLOCKS = {
 				if (func && !(name=="spoiler" && stackContains("spoiler"))) {
 					startBlock(func, {}, props)
 				} else {
-					addBlock(options.invalid(code.substring(start, i), "invalid tag"))
+					addBlock('invalid', code.substring(start, i), "invalid tag")
 				}
 				/*if (displayBlock({type:name}))
 				  skipNextLineBreak = true //what does this even do?*/
@@ -766,9 +767,9 @@ Parse.BLOCKS = {
 						}
 						scan()
 					}
-					addBlock(options[type]({"":url}, altText, preview))
+					addBlock(type, {"":url}, altText)
 				} else {
-					startBlock('link', {inBrackets: after}, {"":url}, preview)
+					startBlock('link', {inBrackets: after}, {"":url})
 					if (!after) {
 						addText(url)
 						endBlock()
@@ -905,7 +906,7 @@ Parse.BLOCKS = {
 		
 	}
 
-	Parse.lang.bbcode = function(codeArg, preview) {
+	Parse.lang.bbcode = function(codeArg) {
 		var noNesting = {
 			spoiler:true
 		}
@@ -964,7 +965,6 @@ Parse.BLOCKS = {
 				return ['video', {"":contents}, args.alt]
 			if (name == 'img')
 				return ['image', {"":contents}, args.alt]
-			console.log("translate error", tag)
 		}
 		
 		init(function() {
@@ -998,7 +998,7 @@ Parse.BLOCKS = {
 								}
 							}
 						} else {
-							addBlock(options.invalid(code.substring(point, i), "unexpected closing tag"))
+							addBlock('invalid', code.substring(point, i), "unexpected closing tag")
 						}
 					}
 				// [... start tag?
@@ -1051,13 +1051,8 @@ Parse.BLOCKS = {
 									var contents = code.substring(i, end)
 									restore(end + endTag.length)
 									
-									// todo: this can't handle args with caching currently
-									var node = tryGetCached(cache, name, contents, function() {
-										var tx = blockTranslate(name, args, contents)
-										console.log('translate single tag', tx)
-										return options[tx[0]](tx[1], tx[2])
-									})
-									addBlock(node)
+									var tx = blockTranslate(name, args, contents)
+									addBlock(tx[0], tx[1], tx[2])
 									
 									if (node.block)
 										skipNextLineBreak = true
@@ -1069,7 +1064,7 @@ Parse.BLOCKS = {
 								var tx = blockTranslate(name, args)
 								startBlock(tx[0], {bbcode:name}, tx[1])
 							} else
-								addBlock(options.invalid(code.substring(point, i), "invalid tag"))
+								addBlock('invalid', code.substring(point, i), "invalid tag")
 						} else
 							cancel()
 					}
@@ -1094,7 +1089,7 @@ Parse.BLOCKS = {
 		function readPlainLink() {
 			if (isUrlStart()) {
 				var url = readUrl()
-				addBlock(options.link({"":url}, url))
+				addBlock('link', {"":url}, url)
 				return true
 			}
 		}
@@ -1157,7 +1152,7 @@ Parse.BLOCKS = {
 	}
 	
 	// "plain text" (with autolinker)
-	Parse.fallback = function(text, preview) {
+	Parse.fallback = function(text) {
 		var options = Parse.options
 		var root = options.root()
 		i = 0
@@ -1195,7 +1190,7 @@ Parse.BLOCKS = {
 		}
 		try {
 			var parser = Parse.lang[lang] || Parse.fallback
-			return parser(text, preview)
+			return parser(text)
 		} catch(e) {
 			try {
 				if (!output) {
