@@ -913,7 +913,7 @@ Parse.BLOCKS = {
 		// this translates bbcode tag names into
 		// the standard block names, + arg, + contents for special blocks
 		// to be passed to startblock or functions to addblock
-		var blockNames = {'b':true,'i':true,'u':true,'s':true,'sup':true,'sub':true,'table':true,'tr':true,'td':true,'align':true,'list':true,'spoiler':true,'quote':true,'anchor':true,'item':true,'h1':true,'h2':true,'h3':true,'th':true,'code':2,'url':true,'youtube':2,'audio':2,'video':2,'img':2}
+		var blockNames = {'b':true,'i':true,'u':true,'s':true,'sup':true,'sub':true,'table':true,'tr':true,'td':true,'align':true,'list':true,'spoiler':true,'quote':true,'anchor':true,'item':true,'h1':true,'h2':true,'h3':true,'th':true,'code':2,'url':2,'youtube':2,'audio':2,'video':2,'img':2}
 		function blockTranslate(name, args, contents) {
 			// direct translations:
 			var name2 = {
