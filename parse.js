@@ -247,8 +247,8 @@ Parse.BLOCKS = {
 
 	function startBlock(type, data, arg) {
 		data.type = type
-		data.isBlock = Parse.BLOCKS[type].block
 		if (type) {
+			data.isBlock = Parse.BLOCKS[type].block
 			openBlocks++
 			if (openBlocks > options.maxDepth)
 				throw "too deep nestted blocks"
