@@ -1055,9 +1055,6 @@ Parse.BLOCKS = {
 									
 									var tx = blockTranslate(name, args, contents)
 									addBlock(tx[0], tx[1], tx[2])
-									
-									if (node.block)
-										skipNextLineBreak = true
 								}
 							} else if (name!="item" && blockNames[name] && !(noNesting[name] && stackContains(name))) {
 								if (name == 'tr' || name == 'table')
