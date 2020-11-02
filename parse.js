@@ -956,8 +956,12 @@ Parse.BLOCKS = {
 			}
 
 			//todo: maybe these should have args mapped over uh
-			if (name == 'url')
-				return ['link', {"":contents}, contents]
+			if (name == 'url') {
+				if (contents != undefined)
+					return ['link', {"":contents}, contents]
+				else
+					return ['link', args]
+			}
 			
 			if (name == 'youtube')
 				return ['youtube', {"":contents}, args.alt]
