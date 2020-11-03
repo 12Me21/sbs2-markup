@@ -993,18 +993,17 @@ Parse.BLOCKS = {
 						cancel()
 					// valid end tag
 					} else {
-						// end last item in lists
+						// end last item in lists (mostly unnecessary now with greedy closing)
 						if (name == "list" && stack.top().type == "item")
 							endBlock(point)
-						if (name == stack.top().bbcode) {
-							endBlock(point)
+						if (greedyCloseTag(name)) {
 							// eat whitespace between table cells
-							if (name == 'td' || name == 'th' || name == 'tr') {
+							if (name == 'td' || name == 'th' || name == 'tr')
 								while(eatChar(' ')||eatChar('\n')){
 								}
-							}
 						} else {
-							addBlock('invalid', code.substring(point, i), "unexpected closing tag")
+							// ignore invalid block
+							//addBlock('invalid', code.substring(point, i), "unexpected closing tag")
 						}
 					}
 				// [... start tag?
@@ -1087,6 +1086,17 @@ Parse.BLOCKS = {
 			restore(point)
 			addText(c)
 			scan()
+		}
+
+		function greedyCloseTag(name) {
+			for (var j=0; j<stack.length; j++)
+				if (stack[j].bbcode == name) {
+					while (stack.top().bbcode != name)//scary
+						endBlock()
+					endBlock()
+					return true
+				}
+			return false
 		}
 
 		function readPlainLink() {
