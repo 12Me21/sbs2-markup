@@ -1191,6 +1191,7 @@ Parse.BLOCKS = {
 	}
 	
 	Parse.parseLang = function(text, lang, preview) {
+		//var start = performance.now()
 		options = Parse.options //temp
 		i=0
 		code = text
@@ -1215,6 +1216,8 @@ Parse.BLOCKS = {
 			} catch (e) {
 				alert("Unrecoverable parser error! please report this!\n"+e+"\n"+e.stack)
 			}
-		}
+		}/* finally {
+			console.log("time:", performance.now() - start)
+		}*/
 	}
 })()
