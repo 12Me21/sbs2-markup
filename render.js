@@ -68,12 +68,6 @@
 		}
 		x.send()
 	}
-	function defaultProtocol() {
-		if (window.location.protocol == 'http:')
-			return 'http:'
-		else
-			return 'https:'
-	}
 	function getYoutubeID(url) {
 		var match = url.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/)
 		if (match)
@@ -87,8 +81,7 @@
 			return [match[1].toLowerCase(), match[2]]
 		return [null, url]
 	}
-
-	Parse.options = {
+	var options = {
 		maxDepth: 10,
 		append: function (parent, child) {
 			parent = parent.branch || parent.node
@@ -105,7 +98,11 @@
 				parent.insertBefore(node.firstChild, node)
 			parent.removeChild(node)
 		},
-		
+
+		filterURL: function(url, type) {
+			
+		},
+		defaultProtocol: window.location.protocol == "http:" ? "http:" : "https:",		
 		//========================
 		// nodes without children:
 		text: function(text) {
@@ -137,15 +134,24 @@
 			return {node:node}
 		},
 		audio: function(args, contents) {
+			var url = args[""]
+			url = options.filterUrl(url, 'audio')
+			if (url == null)
+				return options.link(args, url)
+			
 			var node = document.createElement('audio')
 			node.setAttribute('controls', "")
-			node.setAttribute('src', args[""])
+			node.setAttribute('src', url)
 			if (contents != null)
 				node.appendChild(document.createTextNode(contents))
 			return {node:node}
 		},
 		video: function(args, contents) {
 			var url = args[""]
+			url = options.filterUrl(url, 'video')
+			if (url == null)
+				return options.link(args, url)
+			
 			var node = document.createElement('video')
 			node.setAttribute('controls', "")
 			node.setAttribute('src', url)
@@ -159,7 +165,10 @@
 		},
 		youtube: function(args, contents, preview) { //todo: use contents?
 			var url = args[""]
-			var protocol = defaultProtocol()
+			url = options.filterUrl(url, 'youtube')
+			if (url == null)
+				return options.link(args, contents)
+			
 			var match = getYoutubeID(url)
 			var link = document.createElement('a')
 			var div = document.createElement('div')
@@ -168,7 +177,7 @@
 			link.href = url
 			
 			if (match) {
-				link.style.backgroundImage = 'url("'+protocol+"//i.ytimg.com/vi/"+match+"/mqdefault.jpg"+'")'
+				link.style.backgroundImage = 'url("'+options.defaultProtocol+"//i.ytimg.com/vi/"+match+"/mqdefault.jpg"+'")'
 				var time = url.match(/[&?](?:t|start)=(\w+)/)
 				var end = url.match(/[&?](?:end)=(\w+)/)
 				var loop = url.match(/[&?]loop(=|&|$)/)
@@ -292,7 +301,7 @@
 						}*/
 					} else {
 						// urls without protocol get https:// or http:// added
-						url = defaultProtocol()+"//"+url
+						url = options.defaultProtocol+"//"+url
 					}
 				} else {
 					// unchanged
@@ -339,10 +348,13 @@
 			node.className = "cell"
 			return {node:node}
 		},
-		
+
 		image: function(args, alt) {
-			// <img src= arg tabindex="-1">
 			var url = args[""]
+			url = options.filterUrl(url, 'image')
+			if (url == null)
+				return options.link(args, url)
+			
 			var node = document.createElement('img')
 			node.setAttribute('src', url)
 			node.setAttribute('tabindex', "-1")
@@ -432,4 +444,5 @@
 			return {node:node}
 		},
 	}
+	Parse.options = options
 })()
