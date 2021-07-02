@@ -1031,8 +1031,8 @@ Parse.BLOCKS = {
 								while (c && c!='"')
 									scan()
 								if (c == '"') {
-									arg = code.substring(start, i-1)
 									scan()
+									arg = code.substring(start, i-1)
 								}
 							} else {
 								while (c && c!="]" && c!=" ")
