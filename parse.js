@@ -36,7 +36,8 @@ Parse.BLOCKS = {
 	quote: {block:true},
 	list: {block:true},
 	item: {block:true},
-	link: {},
+	simpleLink: {},
+	customLink: {},
 	table: {block:true},
 	row: {block:true},//not sure, only used internally so block may not matter
 	cell: {},
@@ -624,11 +625,10 @@ Parse.BLOCKS = {
 						}
 						addBlock(type, {"":url}, altText)
 					} else {
-						startBlock('link', {big: true, inBrackets: after}, {"":url})
-						if (!after) {
-							addText(url)
-							endBlock()
-						}
+						if (after)
+							startBlock('customLink', {big: true, inBrackets: true}, {"":url})
+						else
+							addBlock('simpleLink', {"":url})
 					}
 					return true
 				} else {
@@ -769,11 +769,10 @@ Parse.BLOCKS = {
 					}
 					addBlock(type, {"":url}, altText)
 				} else {
-					startBlock('link', {inBrackets: after}, {"":url})
-					if (!after) {
-						addText(url)
-						endBlock()
-					}
+					if (after)
+						startBlock('customLink', {inBrackets: true}, {"":url})
+					else
+						addBlock('simpleLink', {"":url})
 				}
 				return true
 			}
@@ -958,9 +957,9 @@ Parse.BLOCKS = {
 			//todo: maybe these should have args mapped over uh
 			if (name == 'url') {
 				if (contents != undefined)
-					return ['link', {"":contents}, contents]
+					return ['simpleLink', {"":contents}]
 				else
-					return ['link', args]
+					return ['customLink', args]
 			}
 			
 			if (name == 'youtube')
@@ -1102,7 +1101,7 @@ Parse.BLOCKS = {
 		function readPlainLink() {
 			if (isUrlStart()) {
 				var url = readUrl()
-				addBlock('link', {"":url}, url)
+				addBlock('simpleLink', {"":url})
 				return true
 			}
 		}
@@ -1179,7 +1178,7 @@ Parse.BLOCKS = {
 			// text before link
 			options.append(root, options.text(text.substring(last, result.index)))
 			// generate link
-			var link = options.link({"": result[0]}, result[0])
+			var link = options.simpleLink({"": result[0]})
 			options.append(root, link)
 			
 			last = result.index + result[0].length

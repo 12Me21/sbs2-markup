@@ -2,6 +2,51 @@ Parse.options = Object.create(null)
 <!--/* trick indenter
 with (Parse.options) (function($) { "use strict"
 Object.assign(Parse.options, { //*/
+
+createLink: function(url) {
+	// important, do not remove, prevents script injection
+	if (/^ *javascript:/i.test(url))
+		url = ""
+	
+	var protocol = urlProtocol(url)
+	if (protocol[0] == "sbs:") {
+		// put your custom local url handling code here
+		var node = Nav.link(protocol[1])
+	} else {
+		var node = document.createElement('a')
+		if (url[0] != "#")
+			node.setAttribute('target', "_blank")
+		if (!protocol[0]) {
+			if (url[0] == "#") {
+				// put your fragment link handling code here
+				/*var hash1 = Nav.getPath()
+				  var name = url.substr(1)
+				  hash = "#"+hash1[0]+"#"+name
+				  url = hash
+				  node.onclick = function(e) {
+				  var hash2 = Nav.getPath()
+				  if (hash1[0]==hash2[0] && hash2[1]==name) {
+				  var n = document.getElementsByName("_anchor_"+name)
+				  if (n[0])
+				  n[0].scrollIntoView()
+				  e.preventDefault()
+				  } else {
+				  window.location.hash = hash
+				  }
+				  }*/
+			} else {
+				// urls without protocol get https:// or http:// added
+				url = defaultProtocol+"//"+url
+			}
+		} else {
+			// unchanged
+		}
+		node.href = url
+	}
+	
+	return node
+},
+
 newEvent: function(name) {
 	var event = document.createEvent("Event")
 	event.initEvent(name, true, true)
@@ -88,7 +133,7 @@ audio: function(args, contents) {
 	var url = args[""]
 	url = filterURL(url, 'audio')
 	if (url == null)
-		return link(args, url)
+		return simpleLink(args)
 	
 	var node = document.createElement('audio')
 	node.setAttribute('controls', "")
@@ -101,7 +146,7 @@ video: function(args, contents) {
 	var url = args[""]
 	url = filterURL(url, 'video')
 	if (url == null)
-		return link(args, url)
+		return simpleLink(args)
 	
 	var node = document.createElement('video')
 	node.setAttribute('controls', "")
@@ -118,7 +163,7 @@ youtube: function(args, contents, preview) { //todo: use contents?
 	var url = args[""]
 	url = filterURL(url, 'youtube')
 	if (url == null)
-		return link(args, contents)
+		return simpleLink(args)
 	
 	var match = getYoutubeID(url)
 	var link = document.createElement('a')
@@ -217,51 +262,15 @@ item: function(index) {
 },
 //creator('li'), // (list item)
 
-link: function(args, contents) {
-	// <a href= url> ... </a>
-	var url = args[""]
-	// important, do not remove, prevents script injection
-	if (/^ *javascript:/i.test(url))
-		url = ""
-	
-	var protocol = urlProtocol(url)
-	if (protocol[0] == "sbs:") {
-		// put your custom local url handling code here
-		var node = Nav.link(protocol[1])
-	} else {
-		var node = document.createElement('a')
-		if (url[0] != "#")
-			node.setAttribute('target', "_blank")
-		if (!protocol[0]) {
-			if (url[0] == "#") {
-				// put your fragment link handling code here
-				/*var hash1 = Nav.getPath()
-				  var name = url.substr(1)
-				  hash = "#"+hash1[0]+"#"+name
-				  url = hash
-				  node.onclick = function(e) {
-				  var hash2 = Nav.getPath()
-				  if (hash1[0]==hash2[0] && hash2[1]==name) {
-				  var n = document.getElementsByName("_anchor_"+name)
-				  if (n[0])
-				  n[0].scrollIntoView()
-				  e.preventDefault()
-				  } else {
-				  window.location.hash = hash
-				  }
-				  }*/
-			} else {
-				// urls without protocol get https:// or http:// added
-				url = defaultProtocol+"//"+url
-			}
-		} else {
-			// unchanged
-		}
-		node.href = url
-	}
-	if (contents != undefined)
-		node.textContent = contents
-	
+simpleLink: function(args) {
+	var node = createLink(args[""])
+	node.textContent = args[""]
+	return {node:node}
+},
+
+customLink: function(args) {
+	var node = createLink(args[""])
+	node.className += " customLink"
 	return {node:node}
 },
 
@@ -304,7 +313,7 @@ image: function(args, alt) {
 	var url = args[""]
 	url = filterURL(url, 'image')
 	if (url == null)
-		return link(args, url)
+		return simpleLink(args)
 	
 	var node = document.createElement('img')
 	node.setAttribute('src', url)
