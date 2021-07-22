@@ -527,10 +527,15 @@ Parse.BLOCKS = {
 						start = i
 						while (c && c!="\n" && c!="`")
 							scan()
-						//todo: protect against ```why won't this work``` ?
-						var language = code.substring(start, i).trim().toLowerCase()
-						var eaten = eatChar("\n")
-						start = i
+						//treat first line as language name, if it matches the pattern. otherwise it's code
+						var language = code.substring(start, i)
+						var eaten = false
+						if (/^\s*\w+\s*$/.test(language)) {
+							language = language.trim().toLowerCase()
+							eaten = eatChar("\n")
+							start = i
+						}
+						
 						i = code.indexOf("```", i)
 						addBlock('code', {"": language}, code.substring(start, i!=-1 ? i : code.length))
 						skipNextLineBreak = eaten
