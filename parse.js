@@ -530,7 +530,7 @@ Parse.BLOCKS = {
 						//treat first line as language name, if it matches the pattern. otherwise it's code
 						var language = code.substring(start, i)
 						var eaten = false
-						if (/^\s*\w+\s*$/.test(language)) {
+						if (/^\s*\w*\s*$/.test(language)) {
 							language = language.trim().toLowerCase()
 							eaten = eatChar("\n")
 							start = i
