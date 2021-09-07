@@ -304,6 +304,19 @@ Parse.BLOCKS = {
 
 	var options = Parse.options
 	
+	Parse.lang['html'] = function(codeInput) {
+		var x = document.createElement('iframe')
+		x.sandbox = "allow-same-origin"
+		if (x.sandbox instanceof DOMTokenList) {
+			x.src = "javascript:undefined"
+			x.srcdoc = codeInput
+			x.onload = function() {
+				this.style.height = this.contentWindow.document.documentElement.offsetHeight+'px';
+			}
+		}
+		return x
+	}
+	
 	Parse.lang['12y'] = function(codeInput) {
 		// so what happens here is
 		// when a video needs to be generated
