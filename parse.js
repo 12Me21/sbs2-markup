@@ -309,7 +309,7 @@ Parse.BLOCKS = {
 		x.sandbox = "allow-same-origin"
 		if (x.sandbox instanceof DOMTokenList) {
 			x.src = "javascript:undefined"
-			x.srcdoc = codeInput
+			x.srcdoc = "<style>body{margin:0;}</style> "+codeInput
 			x.onload = function() {
 				this.style.height = this.contentWindow.document.documentElement.offsetHeight+'px';
 			}
