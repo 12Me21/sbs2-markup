@@ -365,6 +365,29 @@ anchor: function(args) {
 	node.name = "_anchor_"+name
 	return {node:node}
 },
+ruby: function(args) {
+	var elem = document.createElement('ruby')
+	
+	var first = document.createElement('span')
+	elem.appendChild(first)
+	
+	var x = document.createElement('rp')
+	x.textContent = "("
+	elem.appendChild(x)
+	
+	x = document.createElement('rt')
+	x.textContent = args[""]
+	elem.appendChild(x)
+	
+	var x = document.createElement('rp')
+	x.textContent = ")"
+	elem.appendChild(x)
+	
+	return {
+		node: elem,
+		branch: first,
+	}
+},
 spoiler: function(args) {
 	// <button> arg </button><div class="spoiler"> ... </div>
 	// I'd use <summary>/<details> but it's not widely supported

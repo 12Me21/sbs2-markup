@@ -48,6 +48,7 @@ Parse.BLOCKS = {
 	subscript: {},
 	anchor: {},
 	spoiler: {block:true},
+	ruby: {},
 	bg: {},
 }
 
@@ -345,6 +346,7 @@ Parse.BLOCKS = {
 		
 		var tags = {
 			spoiler: "spoiler",
+			ruby: "ruby",
 			align: "align",
 			sub: "subscript",
 			sup: "superscript",
@@ -735,11 +737,10 @@ Parse.BLOCKS = {
 			end2 = code.indexOf("{", i)
 			if (end2 >= 0 && end2 < end)
 				end = end2
-
-
+			
 			restore(end)
 			eatChar(" ")
-
+			
 			var propst = code.substring(start, end)
 			var props = {}
 			propst.split(",").forEach(function(x){
@@ -930,7 +931,7 @@ Parse.BLOCKS = {
 		// this translates bbcode tag names into
 		// the standard block names, + arg, + contents for special blocks
 		// to be passed to startblock or functions to addblock
-		var blockNames = {'b':true,'i':true,'u':true,'s':true,'sup':true,'sub':true,'table':true,'tr':true,'td':true,'align':true,'list':true,'spoiler':true,'quote':true,'anchor':true,'item':true,'h1':true,'h2':true,'h3':true,'th':true,'code':2,'url':2,'youtube':2,'audio':2,'video':2,'img':2}
+		var blockNames = {'b':true,'i':true,'u':true,'s':true,'sup':true,'sub':true,'table':true,'tr':true,'td':true,'align':true,'list':true,'spoiler':true,'quote':true,'anchor':true,'item':true,'h1':true,'h2':true,'h3':true,'th':true,'code':2,'url':2,'youtube':2,'audio':2,'video':2,'img':2,ruby:true}
 		function blockTranslate(name, args, contents) {
 			// direct translations:
 			var name2 = {
@@ -946,6 +947,7 @@ Parse.BLOCKS = {
 				align: 'align',
 				list: 'list',
 				spoiler: 'spoiler',
+				ruby: 'ruby',
 				quote: 'quote',
 				anchor: 'anchor',
 				item: 'item',
@@ -961,7 +963,7 @@ Parse.BLOCKS = {
 				return ['heading', 3]
 			if (name == 'th')
 				return ['cell', Object.assign({h:true}, args)]
-
+			
 			if (name == 'code') {
 				var inline = args[""] == 'inline'
 				args[""] = args.lang
