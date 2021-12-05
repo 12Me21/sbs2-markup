@@ -877,9 +877,9 @@ Parse.BLOCKS = {
 		// audio, video, image, youtube
 		//todo: improve this lol
 		function urlType(url) {
-			if (/(\.mp3(?!\w)|\.ogg(?!\w)|\.wav(?!\w)|#audio$)/.test(url))
+			if (/(\.mp3(?!\w)|\.ogg(?!\w)|\.wav(?!\w)|#audio$)/i.test(url))
 				return "audio"
-			if (/(\.mp4(?!\w)|\.mkv(?!\w)|#video$)/.test(url))
+			if (/(\.mp4(?!\w)|\.mkv(?!\w)|\.mov(?!\w)|#video$)/i.test(url))
 				return "video"
 			if (/^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\&?/.test(url))
 				return "youtube"
