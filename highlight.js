@@ -388,11 +388,20 @@ var Highlight = {lang:{}}
 					next()
 				push("operator")
 			//
-			//add, subtract, multiply, divide
+			//add, subtract, divide
 			//
-			break;case '+':case '-':case '*':case '/':
+			break;case '+':case '-':case '/':
 				next()
 				push("operator")
+			//
+			//multiply or variadic parameter
+			//
+			break; case '*':
+				next()
+				if (isInExpr(prevType))
+					push('operator')
+				else
+					push('variable', 'variable parameter')
 			//
 			// Line continuation (SB4)
 			//

@@ -723,6 +723,7 @@ Parse.BLOCKS = {
 		
 		// read properties key=value,key=value... ended by a space or \n or } or {
 		// =value is optional and defaults to `true`
+		// todo: add support for escaping and quoting to the parser here. newlines should not be allowed even in quoted attribs unless escaped
 		function readProps() {
 			var start = i
 			var end = code.indexOf(" ", i)
