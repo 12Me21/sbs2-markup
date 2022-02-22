@@ -1,3 +1,5 @@
+// todo: fix trailing <br> not taking up space
+
 Parse.options = Object.create(null)
 <!--/* trick indenter
 with (Parse.options) (function($) { "use strict"
@@ -138,6 +140,7 @@ audio: function(args, contents) {
 	var node = document.createElement('audio')
 	node.setAttribute('controls', "")
 	node.setAttribute('src', url)
+	node.setAttribute('preload', 'none')
 	if (contents != null)
 		node.appendChild(document.createTextNode(contents))
 	return {node:node}
@@ -151,7 +154,7 @@ video: function(args, contents) {
 	var node = document.createElement('video')
 	node.setAttribute('controls', "")
 	node.setAttribute('src', url)
-	node.setAttribute('shrink', "")
+	node.setAttribute('data-shrink', "")
 	if (contents != null)
 		node.appendChild(document.createTextNode(contents))
 	node.onplaying = function() {
@@ -318,12 +321,12 @@ image: function(args, alt) {
 	var node = document.createElement('img')
 	node.setAttribute('src', url)
 	node.setAttribute('tabindex', "-1")
-	node.setAttribute('shrink', "")
-	node.setAttribute('loading', "")
+	node.setAttribute('data-shrink', "")
+	node.setAttribute('data-loading', "")
 	if (alt != null)
 		node.setAttribute('alt', alt)
 	node.onerror = node.onload = function() {
-		node.removeAttribute('loading')
+		node.removeAttribute('data-loading')
 	}
 	// todo: add events for size change ??
 	return {node:node}
@@ -376,7 +379,9 @@ ruby: function(args) {
 	elem.appendChild(x)
 	
 	x = document.createElement('rt')
-	x.textContent = args[""]
+	// note: arguments are set to boolean `true` if value is not present
+	// for historical reasons (i.e. because it's funny) ruby should display the text "true" in this case
+	x.textContent = String(args[""])
 	elem.appendChild(x)
 	
 	var x = document.createElement('rp')
