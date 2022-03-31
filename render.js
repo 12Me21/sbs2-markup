@@ -13,7 +13,10 @@ createLink: function(url) {
 	var protocol = urlProtocol(url)
 	if (protocol[0] == "sbs:") {
 		// put your custom local url handling code here
-		var node = Nav.link(protocol[1])
+		if (typeof Nav == 'object' && Nav.link)
+			var node = Nav.link(protocol[1])
+		else
+			var node = document.createElement('a')
 	} else {
 		var node = document.createElement('a')
 		if (url[0] != "#")
